@@ -1,0 +1,16 @@
+
+GET http://localhost:3000/ping
+
+###
+
+GET http://localhost:3000/not-found
+
+###
+
+POST http://localhost:3000/api/v1/messages
+content-type: application/json
+
+{
+    "model": "gpt-4.1-nano",
+    "content": "hello world!"
+}
