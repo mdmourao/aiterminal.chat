@@ -8,7 +8,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "node --env-file=../.env --watch app.js | pino-pretty",
+    "dev": "node --env-file=.env --watch app.js | pino-pretty",
     "test": "node --test",
     "lint": "npx eslint . ",
     "migrate:latest": "knex --knexfile database/knexfile.js migrate:latest",
@@ -19,6 +19,8 @@
     "@ai-sdk/openai": "^1.3.22",
     "ai": "^4.3.16",
     "bcrypt": "^6.0.0",
+    "better-auth": "^1.2.9",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",

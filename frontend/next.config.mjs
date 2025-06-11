@@ -9,6 +9,15 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
 
-export default nextConfig
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: `${process.env.API_BASE_URL}/api/auth/:path*`,
+      },
+    ];
+  },
+};
+
+export default nextConfig;

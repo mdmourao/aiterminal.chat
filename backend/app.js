@@ -13,9 +13,14 @@ import { limiter } from "./middlewares/limiter.js";
 import logger from "./utils/logger.js";
 await pingDb();
 
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth.js";
+import cors from "cors";
+import { authMiddleware } from "./middlewares/auth.js";
+
 const app = express();
+
 app.use(helmet());
-app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("ok");
@@ -26,6 +31,10 @@ app.get("/ping", (req, res) => {
 });
 
 app.use(limiter);
+app.all("/api/auth/*splat", toNodeHandler(auth));
+app.use(express.json());
+
+app.use(authMiddleware());
 
 app.use("/api/v1", apiRoutes);
 
@@ -37,6 +46,12 @@ app.all(/(.*)/, (req, res) => {
 });
 
 app.use(errorHandler);
+
+app.use(
+  cors({
+    origin: process.env.TRUSTED_ORIGINS?.split(",") || [],
+  })
+);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

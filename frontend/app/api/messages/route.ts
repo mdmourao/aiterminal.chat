@@ -3,7 +3,7 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { content } = await req.json();
 
-  const response = await fetch("http://localhost:3000/api/v1/messages", {
+  const response = await fetch(`${process.env.API_BASE_URL}api/v1/messages`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
