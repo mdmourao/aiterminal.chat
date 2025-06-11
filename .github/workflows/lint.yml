@@ -26,8 +26,8 @@ jobs:
         with:
           extensions: "js,jsx,ts,tsx"
           annotations: true
-          eslint-path: "."
           all-files: true
+          working-directory: frontend/
 
   backend-lint:
     runs-on: ubuntu-latest
@@ -48,5 +48,5 @@ jobs:
         with:
           extensions: "js,jsx,ts,tsx"
           annotations: true
-          eslint-path: "."
           all-files: true
+          working-directory: backend/
