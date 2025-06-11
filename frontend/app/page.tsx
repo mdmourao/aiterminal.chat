@@ -15,7 +15,6 @@ export default function TerminalChat() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState("");
-  const [chatId, setChatId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -59,7 +58,6 @@ export default function TerminalChat() {
         },
         body: JSON.stringify({
           content: userMessage.content,
-          ...(chatId && { chatId }),
         }),
       });
 
@@ -70,7 +68,7 @@ export default function TerminalChat() {
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
-      let assistantMessage: Message = {
+      const assistantMessage: Message = {
         id: "",
         role: "assistant",
         content: "",

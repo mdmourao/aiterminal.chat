@@ -1,7 +1,7 @@
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { content, chatId } = await req.json();
+  const { content } = await req.json();
 
   const response = await fetch("http://localhost:3000/api/v1/messages", {
     method: "POST",
