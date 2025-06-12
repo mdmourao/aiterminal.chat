@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "@/store";
 import { createAuthClient } from "better-auth/client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,6 +14,8 @@ export default function Home() {
     (state: RootState) => state.auth
   );
   const dispatch: AppDispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const chat_id = searchParams.get("chat_id") || "";
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -58,7 +61,7 @@ export default function Home() {
     } else {
       setIsLoading(false);
     }
-  }, [isAuthenticated, dispatch, user]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -75,7 +78,7 @@ export default function Home() {
           className={isAuthenticated ? "" : "blur-[1px] pointer-events-none"}
         >
           <Header />
-          <Chat />
+          <Chat chat_id={chat_id} />
         </div>
 
         {!isAuthenticated && (
@@ -93,7 +96,13 @@ export default function Home() {
                 })();
               }}
             >
-              <Image src="/google-icon.svg" alt="Google" className="w-5 h-5" />
+              <Image
+                src="/google-icon.svg"
+                alt="Google"
+                className="w-5 h-5"
+                width={20}
+                height={20}
+              />
               Sign in with Google
             </button>
           </div>

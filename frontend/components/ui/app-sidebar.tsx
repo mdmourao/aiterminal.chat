@@ -26,13 +26,26 @@ import { createAuthClient } from "better-auth/client";
 import { useEffect, useState } from "react";
 import { Chat } from "@/app/models/chat";
 import { toast } from "sonner";
+import Link from "next/link";
+import { clearWarning } from "@/store/warningSlice";
 
 export function AppSidebar() {
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch: AppDispatch = useDispatch();
   const [chats, setChats] = useState<Chat[]>([]);
 
+  const warning = useSelector((state: RootState) => state.warning.message);
+
   useEffect(() => {
+    fetchChats();
+    dispatch(clearWarning());
+  }, [warning, dispatch]);
+
+  useEffect(() => {
+    fetchChats();
+  }, []);
+
+  const fetchChats = async () => {
     fetch("/api/v1/chats")
       .then((res) => {
         if (!res.ok) {
@@ -47,7 +60,7 @@ export function AppSidebar() {
         console.error("error getting chats", error);
         toast.error("Failed to load chats. Please try again later.");
       });
-  }, []);
+  };
   return (
     <Sidebar>
       <SidebarContent>
@@ -62,13 +75,13 @@ export function AppSidebar() {
               {chats.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton asChild>
-                    <a href={item.id}>
+                    <Link href={`/?chat_id=${item.id}`}>
                       {item.title
                         ? item.title
                         : item.messages.length > 0
-                        ? item.messages[0].content
+                        ? item.messages[0].content.substring(0, 20) + "..."
                         : "Empty Chat"}
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

@@ -14,6 +14,8 @@ import {
 import Image from "next/image";
 import { getLogoFromProvider } from "./utils";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface InputProps {
   handleSubmit: (e: React.FormEvent) => void;
@@ -29,6 +31,7 @@ export function Input(props: InputProps) {
   const [textareaRows, setTextareaRows] = useState(4);
   const [showDropdownModels, setShowDropdownModels] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
@@ -57,6 +60,7 @@ export function Input(props: InputProps) {
   }, [showDropdownModels]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     fetch("/api/v1/models")
       .then((res) => {
         if (!res.ok) {

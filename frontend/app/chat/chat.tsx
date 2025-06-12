@@ -1,20 +1,67 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Message } from "../models/message";
 import { Input } from "./input";
 import Messages from "./messages";
 import { Welcome } from "./welcome";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setWarning } from "../../store/warningSlice";
 
-export default function Chat() {
+export default function Chat({ chat_id }: { chat_id?: string }) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [chatId, setChatId] = useState<string>("");
+  const [chatId, setChatId] = useState<string>(chat_id || "");
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("gpt-4.1-nano");
+  const [isNewChat, setIsNewChat] = useState(true);
+
+  useEffect(() => {
+    if (chat_id && chat_id !== chatId) {
+      setChatId(chat_id);
+    }
+  }, [chat_id]);
+
+  useEffect(() => {
+    if (chatId && chatId !== "" && isNewChat) {
+      fetch(`/api/v1/chats/${chatId}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch chat data");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setMessages(data.messages || []);
+        })
+        .catch((error) => {
+          console.error("Error fetching chat messages:", error);
+          toast.error("Failed to load chat messages. Please try again later.");
+        });
+    }
+  }, [chatId]);
+
+  const newChat = () => {
+    setInput("");
+    setMessages([]);
+    setChatId("");
+    setSelectedModel("gpt-4.1-nano");
+    setIsNewChat(false);
+    router.push(`/`);
+  };
+
+  useEffect(() => {
+    if (input === "clear") {
+      newChat();
+    }
+  }, [input]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsNewChat(false);
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -73,7 +120,11 @@ export default function Chat() {
                         dataLine.slice(6)
                       );
                       setChatId(newChatId);
+                      router.push(`?chat_id=${newChatId}`);
                       console.log("Chat ID set to:", newChatId);
+                      dispatch(
+                        setWarning("you should probably try to refresh...")
+                      );
                     } catch (error) {
                       console.error("Error parsing chatDetails data:", error);
                     }
