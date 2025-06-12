@@ -5,6 +5,7 @@ import Header from "./header/header";
 import { AppDispatch, RootState } from "@/store";
 import { createAuthClient } from "better-auth/client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -57,7 +58,7 @@ export default function Home() {
     } else {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, dispatch, user]);
 
   if (isLoading) {
     return (
@@ -92,7 +93,7 @@ export default function Home() {
                 })();
               }}
             >
-              <img src="/google-icon.svg" alt="Google" className="w-5 h-5" />
+              <Image src="/google-icon.svg" alt="Google" className="w-5 h-5" />
               Sign in with Google
             </button>
           </div>

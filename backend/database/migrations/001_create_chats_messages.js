@@ -1,5 +1,3 @@
-// migrations/<timestamp>_create_chats_and_messages_tables.js
-
 export const up = function (knex) {
   return knex.schema
     .createTable("chats", function (table) {

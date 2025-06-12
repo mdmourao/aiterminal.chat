@@ -120,7 +120,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-85px)]">
+    <div className="flex flex-col h-[calc(100vh-65px)]">
       <div className="flex-1 p-4 overflow-y-auto">
         <Welcome />
 
