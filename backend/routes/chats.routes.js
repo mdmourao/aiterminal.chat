@@ -1,7 +1,7 @@
 import express from "express";
-import { getAllChats } from "../controllers/chats.controller.js";
+import chatsController from "../controllers/chats.controller.js";
 
 const router = express.Router();
-router.get("/", getAllChats);
+router.get("/", chatsController.get);
 
 export default router;

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { getLogoFromProvider } from "./utils";
+import { toast } from "sonner";
 
 interface InputProps {
   handleSubmit: (e: React.FormEvent) => void;
@@ -67,7 +68,8 @@ export function Input(props: InputProps) {
         setModels(data);
       })
       .catch((error) => {
-        console.log("error getting models", error);
+        console.error("error getting models", error);
+        toast.error("Failed to load models. Please try again later.");
       });
   }, []);
 
@@ -90,7 +92,6 @@ export function Input(props: InputProps) {
             <DropdownMenuLabel>Models</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {models.map((model) => {
-              console.log("model", model);
               return (
                 <DropdownMenuCheckboxItem
                   key={model.value}

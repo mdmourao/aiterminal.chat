@@ -1,13 +1,4 @@
-import {
-  Calendar,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  User2,
-  ChevronUp,
-  Terminal,
-} from "lucide-react";
+import { Terminal } from "lucide-react";
 
 import {
   Sidebar,
@@ -32,19 +23,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import Image from "next/image";
 import { createAuthClient } from "better-auth/client";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-];
+import { useEffect, useState } from "react";
+import { Chat } from "@/app/models/chat";
+import { toast } from "sonner";
 
 export function AppSidebar() {
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch: AppDispatch = useDispatch();
+  const [chats, setChats] = useState<Chat[]>([]);
+
+  useEffect(() => {
+    fetch("/api/v1/chats")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        return res.json();
+      })
+      .then(({ data }) => {
+        setChats(data);
+      })
+      .catch((error) => {
+        console.error("error getting chats", error);
+        toast.error("Failed to load chats. Please try again later.");
+      });
+  }, []);
   return (
     <Sidebar>
       <SidebarContent>
@@ -56,12 +59,15 @@ export function AppSidebar() {
           <SidebarGroupLabel>History</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {chats.map((item) => (
+                <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                    <a href={item.id}>
+                      {item.title
+                        ? item.title
+                        : item.messages.length > 0
+                        ? item.messages[0].content
+                        : "Empty Chat"}
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

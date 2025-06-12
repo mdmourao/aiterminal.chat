@@ -6,15 +6,22 @@ import { openai } from "@ai-sdk/openai";
 import logger from "../utils/logger.js";
 
 class MessageService {
-  async createMessage(createMessageDTO, res) {
+  async createMessage(req, res, createMessageDTO) {
+    console.log("Creating message with DTO:", createMessageDTO);
     try {
       let chat;
-      if (createMessageDTO.chatId === undefined) {
+      if (
+        createMessageDTO.chatId === undefined ||
+        createMessageDTO.chatId === ""
+      ) {
         logger.info("No Chat ID, creating new chat");
-        chat = await chatsRepository.create();
+        chat = await chatsRepository.create(req.user.id);
       } else {
         logger.info(`Using ChatID: ${createMessageDTO.chatId}`);
-        chat = await chatsRepository.getById(createMessageDTO.chatId);
+        chat = await chatsRepository.getById(
+          createMessageDTO.chatId,
+          req.user.id
+        );
       }
 
       if (!chat) {
@@ -41,24 +48,28 @@ class MessageService {
 
       // Start Streaming
       res.write(`event: chatDetails\n`);
+
       res.write(
         `data: ${JSON.stringify({
-          messageId: message.id,
+          chatId: chat.id,
         })}\n\n`
       );
+
+      const messages = chat.messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      console.log("Messages for AI:", messages);
 
       // Request AI
       let fullResponseContent = "";
       const result = streamText({
         model: openai(createMessageDTO.model),
-        messages: chat.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        messages: messages,
       });
 
       for await (const delta of result.fullStream) {
-        logger.info(delta);
         if (delta.type === "text-delta") {
           fullResponseContent += delta.textDelta;
           res.write(`event: textDelta\n`);
@@ -71,9 +82,6 @@ class MessageService {
         }
       }
 
-      logger.info("Stream from AI stopped");
-      logger.info(message);
-
       // End: Save all
       await messageRepository.create({
         chatId: chat.id,
@@ -83,8 +91,6 @@ class MessageService {
         streamedComplete: true,
       });
 
-      logger.info("Message assistant created: OK");
-
       res.write(`event: streamComplete\n`);
       res.write(
         `data: ${JSON.stringify({
@@ -93,9 +99,9 @@ class MessageService {
         })}\n\n`
       );
 
-      logger.info("All done: bye");
+      logger.info("All done: streamComplete");
     } catch (error) {
-      logger.info("Error in service: ", error);
+      logger.error(error, "Error in service");
       if (!res.writableEnded) {
         res.write(`event: error\n`);
         res.write(

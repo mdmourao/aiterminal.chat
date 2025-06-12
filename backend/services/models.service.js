@@ -1,13 +1,13 @@
-import customLogger from "../utils/logger.js";
+import logger from "../utils/logger.js";
 import modelsRepository from "../repositories/models.repository.js";
 
 class ModelsService {
-  async getModels(limit, offset) {
+  async getModels() {
     try {
-      const models = await modelsRepository.get(limit, offset);
+      const models = await modelsRepository.get();
       return models;
     } catch (error) {
-      customLogger.info("Error in service: ", error);
+      logger.info(error, "Error in service");
       throw error;
     }
   }

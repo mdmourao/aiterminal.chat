@@ -1,25 +1,22 @@
 export async function POST(req: Request) {
-  const { content } = await req.json();
+  const body = await req.json();
 
-  // Copy all original headers
-  const headers = new Headers(req.headers);
-  // Ensure content-type is set correctly
-  headers.set("Content-Type", "application/json");
+  const headers = new Headers({
+    "Content-Type": "application/json",
+  });
+  headers.set("Authorization", req.headers.get("authorization") || "");
+  headers.set("cookie", req.headers.get("cookie") || "");
 
   const response = await fetch(`${process.env.API_BASE_URL}api/v1/messages`, {
     method: "POST",
     headers,
-    body: JSON.stringify({
-      model: "gpt-4.1-nano",
-      content: content,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
     throw new Error(`API request failed: ${response.statusText}`);
   }
 
-  // Return the SSE stream with proper headers
   return new Response(response.body, {
     headers: {
       "Content-Type": "text/event-stream",

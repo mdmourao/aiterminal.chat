@@ -4,9 +4,11 @@ import { Message } from "../models/message";
 import { Input } from "./input";
 import Messages from "./messages";
 import { Welcome } from "./welcome";
+import { toast } from "sonner";
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [chatId, setChatId] = useState<string>("");
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState("gpt-4.1-nano");
@@ -34,6 +36,7 @@ export default function Chat() {
         body: JSON.stringify({
           content: userMessage.content,
           model: selectedModel,
+          chatId: chatId,
         }),
       });
 
@@ -63,6 +66,18 @@ export default function Chat() {
 
               switch (event) {
                 case "chatDetails":
+                  const dataLine = lines.find((l) => l.startsWith("data: "));
+                  if (dataLine) {
+                    try {
+                      const { chatId: newChatId } = JSON.parse(
+                        dataLine.slice(6)
+                      );
+                      setChatId(newChatId);
+                      console.log("Chat ID set to:", newChatId);
+                    } catch (error) {
+                      console.error("Error parsing chatDetails data:", error);
+                    }
+                  }
                   continue;
                 case "textDelta":
                   continue;
@@ -108,13 +123,15 @@ export default function Chat() {
                 }
               } catch (error) {
                 console.error("Error parsing SSE data:", error);
+                toast.error("Error processing message data.");
               }
             }
           }
         }
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Message sending failed:", error);
+      toast.error("Failed to send message. Please try again.");
       setIsLoading(false);
     }
   };

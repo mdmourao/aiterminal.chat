@@ -1,8 +1,8 @@
 import Joi from "joi";
 
 const createMessageSchema = Joi.object({
-  chatId: Joi.number(),
-  model: Joi.string().min(4).required(),
+  chatId: Joi.string().allow(""),
+  model: Joi.string().min(3).max(32_000).required(),
   content: Joi.string().required(),
 });
 

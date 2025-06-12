@@ -1,5 +1,5 @@
 class ControllersUtils {
-  processLimitOffset(req) {
+  getLimitOffset(req) {
     let limit = req.query.limit || 10;
     const offset = req.query.offset || 0;
 

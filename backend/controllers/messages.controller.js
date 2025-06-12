@@ -3,37 +3,32 @@ import { CreateMessageDTO } from "../dto/messages.dto.js";
 import { BadRequestError } from "../utils/error.js";
 import messagesService from "../services/messages.service.js";
 import logger from "../utils/logger.js";
-
 export const createMessage = async (req, res, next) => {
-  // set connection to stream
-  res.writeHead(200, {
-    "Content-Type": "text/event-stream", // Server-Sent Events (SSE)
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive",
-  });
-
   try {
     const { error } = validateCreateMessage(req.body);
     if (error) {
-      return next(new BadRequestError(error.message));
+      throw new BadRequestError(error.message);
     }
 
+    logger.info("Creating message with body:" + JSON.stringify(req.body));
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+
     const createMessageDTO = new CreateMessageDTO(req.body);
-    await messagesService.createMessage(createMessageDTO, res);
+    await messagesService.createMessage(req, res, createMessageDTO);
   } catch (error) {
-    logger.error("Controller Error:", error);
-    if (!res.writableEnded) {
-      res.write(`event: error\n`);
-      res.write(
-        `data: ${JSON.stringify({
-          error: "Internal server error",
-        })}\n\n`
-      );
+    logger.error(error, "Controller Error");
+
+    if (!res.headersSent) {
+      res.status(error.statusCode || 500).json({
+        error: error.message || "Internal server error",
+      });
     }
+
     next(error);
-  } finally {
-    if (!res.writableEnded) {
-      res.end();
-    }
   }
 };

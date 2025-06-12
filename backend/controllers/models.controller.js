@@ -1,13 +1,10 @@
-import controllerUtils from "./utils.js";
 import modelsService from "../services/models.service.js";
 import { ModelResponseDTO } from "../dto/models.dto.js";
 
 class ModelsController {
   async getModels(req, res, next) {
     try {
-      const { limit, offset } = controllerUtils.processLimitOffset(req);
-
-      const models = await modelsService.getModels(limit, offset);
+      const models = await modelsService.getModels();
 
       const modelsResponseDTO = models.map(
         (model) => new ModelResponseDTO(model)
