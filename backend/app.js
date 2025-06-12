@@ -14,7 +14,7 @@ import { pingDb } from "./database/connection.js";
 import { limiter } from "./middlewares/limiter.js";
 import logger from "./utils/logger.js";
 import { auth } from "./lib/auth.js";
-// import { authMiddleware } from "./middlewares/auth.js";
+import { authMiddleware } from "./middlewares/auth.js";
 
 await pingDb();
 
@@ -44,8 +44,7 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
 app.use(limiter);
 
-// app.use("/api/v1", authMiddleware(), apiRoutes);
-app.use("/api/v1", apiRoutes);
+app.use("/api/v1", authMiddleware(), apiRoutes);
 
 app.all(/(.*)/, (req, res) => {
   res.status(404).json({

@@ -18,10 +18,12 @@ const Header = () => {
 
   return (
     <div
-      className={`border-b p-4 flex items-center justify-between border-green-600/30`}
+      className={`p-1 flex items-center justify-between border-b border-gray-200`}
     >
       <div className="flex items-center gap-2">
         <SidebarTrigger />
+      </div>
+      <div className="flex items-center gap-2 p-4 ">
         <Terminal className="w-5 h-5" />
         <span className={`text-gray-800`}>aiterminal.chat</span>
       </div>

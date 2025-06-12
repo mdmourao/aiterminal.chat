@@ -56,7 +56,6 @@ export default function Chat() {
           if (done) break;
 
           const chunk = decoder.decode(value);
-          console.log("Received chunk:", chunk);
           const lines = chunk.split("\n");
           for (const line of lines) {
             if (line.startsWith("event: ")) {
@@ -80,7 +79,6 @@ export default function Chat() {
             } else if (line.startsWith("data: ")) {
               try {
                 const data = JSON.parse(line.slice(6));
-                console.log(data);
 
                 if (data.messageId && !assistantMessage.id) {
                   assistantMessage.id = data.messageId;

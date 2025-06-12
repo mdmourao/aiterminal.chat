@@ -1,11 +1,14 @@
 export async function POST(req: Request) {
   const { content } = await req.json();
 
+  // Copy all original headers
+  const headers = new Headers(req.headers);
+  // Ensure content-type is set correctly
+  headers.set("Content-Type", "application/json");
+
   const response = await fetch(`${process.env.API_BASE_URL}api/v1/messages`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify({
       model: "gpt-4.1-nano",
       content: content,

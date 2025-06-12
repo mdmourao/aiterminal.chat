@@ -1,7 +1,7 @@
 import pino from "pino";
 
-const logger = pino({
+const customLogger = pino({
   level: process.env.NODE_ENV === "production" ? "info" : "debug",
 });
 
-export default logger;
+export default customLogger;

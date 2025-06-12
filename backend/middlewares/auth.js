@@ -1,5 +1,6 @@
 import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
+import customLogger from "../utils/logger.js";
 
 export const authMiddleware = () => {
   return async (req, res, next) => {
@@ -8,8 +9,10 @@ export const authMiddleware = () => {
     });
 
     if (!session) {
+      customLogger.warn("Unauthorized access attempt");
       return res.status(401).json({ error: "Unauthorized" });
     }
+    customLogger.info("User authenticated successfully");
     req.user = session.user;
     next();
   };

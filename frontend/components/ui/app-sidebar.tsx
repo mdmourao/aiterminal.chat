@@ -6,6 +6,7 @@ import {
   Settings,
   User2,
   ChevronUp,
+  Terminal,
 } from "lucide-react";
 
 import {
@@ -27,6 +28,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import Image from "next/image";
+import { createAuthClient } from "better-auth/client";
 
 // Menu items.
 const items = [
@@ -35,34 +40,20 @@ const items = [
     url: "#",
     icon: Home,
   },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
 ];
 
 export function AppSidebar() {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch: AppDispatch = useDispatch();
   return (
     <Sidebar>
       <SidebarContent>
+        <div className="flex items-center gap-2 p-4 ">
+          <Terminal className="w-5 h-5" />
+          <span className={`text-gray-800`}>aiterminal.chat</span>
+        </div>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>History</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -85,17 +76,31 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
-                  <ChevronUp className="ml-auto" />
+                  <Image
+                    src={user?.image || "/default-avatar.png"}
+                    className="w-6 h-6 rounded-full ml-2"
+                    width={24}
+                    height={24}
+                    alt="User Avatar"
+                  />
+                  {user?.name}
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuItem>Team</DropdownMenuItem>
-                <DropdownMenuItem>Subscription</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    const authClient = createAuthClient();
+                    await authClient.signOut();
+                    dispatch({
+                      type: "auth/logout",
+                    });
+                  }}
+                >
+                  Sign Out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
