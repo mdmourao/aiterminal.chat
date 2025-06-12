@@ -8,7 +8,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "node --env-file=.env --watch app.js | pino-pretty",
+    "dev": "NODE_DEBUG=undici node --env-file=.env --watch app.js | pino-pretty",
     "test": "node --test",
     "lint": "npx eslint . ",
     "migrate:latest": "knex --knexfile database/knexfile.js migrate:latest",

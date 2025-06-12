@@ -5,22 +5,31 @@ dotenv.config();
 
 import express from "express";
 import helmet from "helmet";
+import cors from "cors";
+import { toNodeHandler } from "better-auth/node";
+
 import apiRoutes from "./routes/api.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-
 import { pingDb } from "./database/connection.js";
 import { limiter } from "./middlewares/limiter.js";
 import logger from "./utils/logger.js";
-await pingDb();
-
-import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
-import cors from "cors";
-import { authMiddleware } from "./middlewares/auth.js";
+// import { authMiddleware } from "./middlewares/auth.js";
+
+await pingDb();
 
 const app = express();
 
 app.use(helmet());
+app.use(
+  cors({
+    origin: process.env.TRUSTED_ORIGINS?.split(",") || [],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("ok");
@@ -30,12 +39,12 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-app.use(limiter);
 app.all("/api/auth/*splat", toNodeHandler(auth));
+
 app.use(express.json());
+app.use(limiter);
 
-app.use(authMiddleware());
-
+// app.use("/api/v1", authMiddleware(), apiRoutes);
 app.use("/api/v1", apiRoutes);
 
 app.all(/(.*)/, (req, res) => {
@@ -46,12 +55,6 @@ app.all(/(.*)/, (req, res) => {
 });
 
 app.use(errorHandler);
-
-app.use(
-  cors({
-    origin: process.env.TRUSTED_ORIGINS?.split(",") || [],
-  })
-);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

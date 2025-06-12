@@ -14,3 +14,7 @@ content-type: application/json
     "model": "gpt-4.1-nano",
     "content": "hello world!"
 }
+
+### 
+
+POST http://localhost:3001/api/auth/login
