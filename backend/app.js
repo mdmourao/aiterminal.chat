@@ -15,6 +15,7 @@ import { limiter } from "./middlewares/limiter.js";
 import logger from "./utils/logger.js";
 import { auth } from "./lib/auth.js";
 import { authMiddleware } from "./middlewares/auth.js";
+import paymentsController from "./controllers/payments.controller.js";
 
 await pingDb();
 
@@ -40,6 +41,11 @@ app.get("/ping", (req, res) => {
 });
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
+app.post(
+  "/api/v1/payments/webhook",
+  express.raw({ type: "application/json" }),
+  paymentsController.webhook
+);
 
 app.use(express.json());
 app.use(limiter);

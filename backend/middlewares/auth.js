@@ -12,7 +12,7 @@ export const authMiddleware = () => {
       customLogger.warn("Unauthorized access attempt");
       return res.status(401).json({ error: "Unauthorized" });
     }
-    customLogger.info("User authenticated successfully");
+    customLogger.info("User auth: OK");
     req.user = session.user;
     next();
   };

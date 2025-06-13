@@ -28,6 +28,7 @@ import { Chat } from "@/app/models/chat";
 import { toast } from "sonner";
 import Link from "next/link";
 import { clearWarning } from "@/store/warningSlice";
+import StripeComponent from "@/app/stripe/stripe";
 
 export function AppSidebar() {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -90,6 +91,9 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarContent>
+          <StripeComponent></StripeComponent>
+        </SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>

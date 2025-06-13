@@ -3,11 +3,13 @@ import authRoutes from "./auth.routes.js";
 import chatRoutes from "./chats.routes.js";
 import messagesRoutes from "./messages.routes.js";
 import modelsRoutes from "./models.routes.js";
+import paymentsRoutes from "./payments.routes.js";
 
 const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/chats", chatRoutes);
 router.use("/messages", messagesRoutes);
 router.use("/models", modelsRoutes);
+router.use("/payments", paymentsRoutes);
 
 export default router;
