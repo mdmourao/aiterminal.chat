@@ -13,6 +13,7 @@
     "lint": "npx eslint . ",
     "migrate:latest": "knex --knexfile database/knexfile.js migrate:latest",
     "migrate:rollback": "knex --knexfile database/knexfile.js migrate:rollback",
+    "seed": "knex --knexfile database/knexfile.js seed:run",
     "migrate:make": "knex migrate:make"
   },
   "dependencies": {
