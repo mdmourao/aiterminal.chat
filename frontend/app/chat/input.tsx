@@ -1,5 +1,5 @@
 "use client";
-import { Send } from "lucide-react";
+import { Send, Sparkle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Model } from "../models/model";
 import {} from "@radix-ui/react-dropdown-menu";
@@ -103,20 +103,23 @@ export function Input(props: InputProps) {
                   onClick={() => {
                     props.setSelectedModel(model.value);
                     setShowDropdownModels(false);
-
                     if (props.input === "m:") {
                       props.setInput("");
                     }
                   }}
+                  className="flex items-center justify-between"
                 >
-                  <Image
-                    src={getLogoFromProvider(model.provider)}
-                    alt={model.label}
-                    width={30}
-                    height={30}
-                    className="w-4 h-4 mr-2 inline"
-                  />
-                  <span className="text-green-500">{model.label}</span>
+                  <div className="flex items-center">
+                    <Image
+                      src={getLogoFromProvider(model.provider)}
+                      alt={model.label}
+                      width={30}
+                      height={30}
+                      className="w-4 h-4 mr-2"
+                    />
+                    <span className="text-green-500">{model.label}</span>
+                  </div>
+                  {model.premium && <Sparkle className="ml-2" />}
                 </DropdownMenuCheckboxItem>
               );
             })}

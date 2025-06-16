@@ -68,6 +68,7 @@ export default function Chat({ chat_id }: { chat_id?: string }) {
       id: Date.now().toString(),
       role: "user",
       content: input.trim(),
+      model: "user",
     };
 
     setMessages((prev: Message[]) => [...prev, userMessage]);
@@ -98,6 +99,7 @@ export default function Chat({ chat_id }: { chat_id?: string }) {
         id: "",
         role: "assistant",
         content: "",
+        model: selectedModel,
       };
 
       if (reader) {

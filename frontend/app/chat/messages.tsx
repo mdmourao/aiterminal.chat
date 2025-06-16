@@ -20,7 +20,7 @@ export default function Messages(props: MessagesProps) {
           {message.role === "assistant" ? (
             <div className="flex items-start gap-2">
               <span className="text-blue-400 shrink-0">
-                gpt-4.1-nano@system:~$
+                {message.model}@system:~$
               </span>
               <div className={`text-black break-words whitespace-pre-wrap`}>
                 <Markdown
@@ -56,7 +56,7 @@ export default function Messages(props: MessagesProps) {
           ) : (
             <div className="flex items-start gap-2">
               <span className={`text-green-500 shrink-0`}>
-                {message.model || "user"}@terminal:~$
+                user@terminal:~$
               </span>
               <span className={`text-black break-words`}>
                 {message.content}

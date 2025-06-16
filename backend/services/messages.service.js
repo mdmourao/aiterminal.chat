@@ -3,22 +3,45 @@ import messageRepository from "../repositories/messages.repository.js";
 
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
+import { xai } from "@ai-sdk/xai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { deepseek } from "@ai-sdk/deepseek";
+
 import logger from "../utils/logger.js";
 import subscriptionsRepository from "../repositories/subscriptions.repository.js";
+import modelsRepository from "../repositories/models.repository.js";
 
 class MessageService {
   async createMessage(req, res, createMessageDTO) {
     console.log("Creating message with DTO:", createMessageDTO);
     try {
-      // we should probably do this afte some checks, but I prefer to use a more close approach for now
-      const creditsDecremented =
-        await subscriptionsRepository.decrementFreeCreditsIfAvailable(
-          req.user.id
-        );
+      const model = await modelsRepository.getByValue(createMessageDTO.model);
 
+      if (!model) {
+        logger.error(
+          `Model ${createMessageDTO.model} not found in the database.`
+        );
+        throw new Error(`Model ${createMessageDTO.model} not found.`);
+      }
+
+      let creditsDecremented;
+      if (model.premium) {
+        creditsDecremented =
+          await subscriptionsRepository.decrementPremiumCreditsIfAvailable(
+            req.user.id
+          );
+      } else {
+        creditsDecremented =
+          await subscriptionsRepository.decrementFreeCreditsIfAvailable(
+            req.user.id
+          );
+      }
+
+      // we should probably do this afte some checks, but I prefer to use a more close approach for now
       if (!creditsDecremented.success) {
-        logger.warn("No free credits available", req.user.id);
-        throw new Error("No free credits available");
+        logger.warn("No credits available", req.user.id);
+        throw new Error("No credits available");
       }
 
       let chat;
@@ -72,10 +95,45 @@ class MessageService {
         content: m.content,
       }));
 
+      let languageModelToUse;
+
+      switch (model.value) {
+        case "o4-mini":
+        case "gpt-4.1-nano":
+        case "o3-mini":
+        case "gpt-3.5-turbo":
+          languageModelToUse = openai(createMessageDTO.model);
+          break;
+        case "gemini-2.5-pro-preview-05-06":
+        case "gemini-2.5-flash-preview-04-17":
+          languageModelToUse = google(createMessageDTO.model);
+          break;
+        case "grok-3":
+        case "grok-3-mini":
+          languageModelToUse = xai(createMessageDTO.model);
+          break;
+        case "claude-4-sonnet-20250514":
+        case "claude-4-opus-20250514":
+          languageModelToUse = anthropic(createMessageDTO.model);
+          break;
+        case "deepseek-chat":
+        case "deepseek-reasoner":
+          languageModelToUse = deepseek(createMessageDTO.model);
+          break;
+        default:
+          throw new Error(`Model ${createMessageDTO.model} is not supported.`);
+      }
+
+      logger.info(
+        `Using model: ${JSON.stringify(languageModelToUse)} for chat ID: ${
+          chat.id
+        }`
+      );
+
       // Request AI
       let fullResponseContent = "";
       const result = streamText({
-        model: openai(createMessageDTO.model),
+        model: languageModelToUse,
         messages: messages,
       });
 
@@ -92,14 +150,9 @@ class MessageService {
         }
       }
 
-      // End: Save all
-      await messageRepository.create({
-        chatId: chat.id,
-        role: "assistant",
-        model: createMessageDTO.model,
-        content: fullResponseContent,
-        streamedComplete: true,
-      });
+      if (fullResponseContent.length === 0) {
+        throw new Error("No content received from AI model");
+      }
 
       res.write(`event: streamComplete\n`);
       res.write(
@@ -109,7 +162,17 @@ class MessageService {
         })}\n\n`
       );
 
-      logger.info("All done: streamComplete");
+      await messageRepository.create({
+        chatId: chat.id,
+        role: "assistant",
+        model: createMessageDTO.model,
+        content: fullResponseContent,
+        streamedComplete: true,
+      });
+
+      logger.info(
+        `Message streaming completed successfully: ${fullResponseContent}`
+      );
     } catch (error) {
       logger.error(error, "Error in service");
       if (!res.writableEnded) {
@@ -121,7 +184,7 @@ class MessageService {
         );
       }
 
-      // TODO: error: update complete and add message error?
+      throw error;
     }
   }
 }

@@ -6,6 +6,11 @@ class ModelsRepository {
     const result = await pool.query(modelsQueries.get);
     return result.rows;
   }
+
+  async getByValue(modelValue) {
+    const result = await pool.query(modelsQueries.getByValue, [modelValue]);
+    return result.rows[0];
+  }
 }
 
 export default new ModelsRepository();
