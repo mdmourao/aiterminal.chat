@@ -30,6 +30,7 @@ import Link from "next/link";
 import { clearWarning } from "@/store/warningSlice";
 import { Badge } from "./badge";
 import { Progress } from "./progress";
+import { Button } from "./button";
 
 export function AppSidebar() {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -46,6 +47,34 @@ export function AppSidebar() {
   useEffect(() => {
     fetchChats();
   }, []);
+
+  const refetchUserInfo = () => {
+    fetch("/api/v1/auth/me", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Cache-Control",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data.data) {
+          dispatch({
+            type: "auth/updateUserInfo",
+            payload: { user: data.data },
+          });
+          toast.success("Messages information updated successfully.");
+        }
+      })
+      .catch(() => {});
+  };
 
   const fetchChats = async () => {
     fetch("/api/v1/chats")
@@ -143,7 +172,7 @@ export function AppSidebar() {
                       <input type="hidden" name="cancel" value="true" />
                       <Sparkles />
                       <button id="cancel-subscription-button" type="submit">
-                        Cancel Subscription
+                        Manage Subscription
                       </button>
                     </form>
                   )}
@@ -183,6 +212,14 @@ export function AppSidebar() {
                     />
                   </div>
                 </DropdownMenuItem>
+
+                <Button
+                  className="flex justify-center m-2"
+                  variant="outline"
+                  onClick={refetchUserInfo}
+                >
+                  Refresh Messages
+                </Button>
 
                 <DropdownMenuSeparator />
 
