@@ -4,11 +4,23 @@ import messageRepository from "../repositories/messages.repository.js";
 import { streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import logger from "../utils/logger.js";
+import subscriptionsRepository from "../repositories/subscriptions.repository.js";
 
 class MessageService {
   async createMessage(req, res, createMessageDTO) {
     console.log("Creating message with DTO:", createMessageDTO);
     try {
+      // we should probably do this afte some checks, but I prefer to use a more close approach for now
+      const creditsDecremented =
+        await subscriptionsRepository.decrementFreeCreditsIfAvailable(
+          req.user.id
+        );
+
+      if (!creditsDecremented.success) {
+        logger.warn("No free credits available", req.user.id);
+        throw new Error("No free credits available");
+      }
+
       let chat;
       if (
         createMessageDTO.chatId === undefined ||
@@ -59,8 +71,6 @@ class MessageService {
         role: m.role,
         content: m.content,
       }));
-
-      console.log("Messages for AI:", messages);
 
       // Request AI
       let fullResponseContent = "";

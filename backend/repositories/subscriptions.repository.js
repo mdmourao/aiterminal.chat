@@ -79,6 +79,22 @@ class SubscriptionsRepository {
     ]);
     return result.rows[0];
   }
+
+  async decrementFreeCreditsIfAvailable(userId) {
+    const result = await pool.query(
+      subscriptionsQueries.decrementFreeCreditsIfAvailable,
+      [userId]
+    );
+    return result.rows[0];
+  }
+
+  async decrementPremiumCreditsIfAvailable(userId) {
+    const result = await pool.query(
+      subscriptionsQueries.decrementPremiumCreditsIfAvailable,
+      [userId]
+    );
+    return result.rows[0];
+  }
 }
 
 export default new SubscriptionsRepository();

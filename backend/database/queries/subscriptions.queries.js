@@ -32,4 +32,32 @@ export const subscriptionsQueries = {
     WHERE user_id = $1
     RETURNING *;
   `,
+
+  decrementFreeCreditsIfAvailable: `
+    WITH update_attempt AS (
+      UPDATE subscriptions
+      SET credits = credits - 1
+      WHERE user_id = $1 AND credits > 0
+      RETURNING credits AS new_credits
+    )
+    SELECT
+      CASE WHEN EXISTS (SELECT 1 FROM update_attempt) THEN TRUE ELSE FALSE END AS success,
+      COALESCE((SELECT new_credits FROM update_attempt), s.credits) AS new_credits_after_attempt
+    FROM subscriptions s
+    WHERE s.user_id = $1;
+  `,
+
+  decrementPremiumCreditsIfAvailable: `
+    WITH update_attempt AS (
+      UPDATE subscriptions
+      SET premium_credits = premium_credits - 1
+      WHERE user_id = $1 AND premium_credits > 0
+      RETURNING premium_credits AS new_premium_credits 
+    )
+    SELECT
+      CASE WHEN EXISTS (SELECT 1 FROM update_attempt) THEN TRUE ELSE FALSE END AS success,
+      COALESCE((SELECT new_premium_credits FROM update_attempt), s.premium_credits) AS new_premium_credits_after_attempt
+    FROM subscriptions s
+    WHERE s.user_id = $1;
+  `,
 };
