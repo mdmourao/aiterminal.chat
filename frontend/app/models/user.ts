@@ -12,4 +12,6 @@ export interface Subscription {
   credits: number;
   currentPeriodEnd: string;
   currentPeriodStart: string;
+  premiumCreditsQuota: number;
+  creditsQuota: number;
 }

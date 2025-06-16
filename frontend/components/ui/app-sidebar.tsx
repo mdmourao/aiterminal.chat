@@ -63,6 +63,11 @@ export function AppSidebar() {
         toast.error("Failed to load chats. Please try again later.");
       });
   };
+
+  if (!user) {
+    return <></>;
+  }
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -104,16 +109,16 @@ export function AppSidebar() {
                     height={24}
                     alt="User Avatar"
                   />
-                  {user?.name}
+                  {user.name}
 
-                  <Badge>{user?.subscription.plan}</Badge>
+                  <Badge>{user.subscription.plan}</Badge>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  {user?.subscription.plan === "free" ? (
+                  {user.subscription.plan === "free" ? (
                     <form
                       action="/api/v1/subscriptions/create-checkout-session"
                       method="POST"
@@ -149,22 +154,29 @@ export function AppSidebar() {
                 <DropdownMenuItem disabled>
                   <div className="w-full max-w-sm">
                     <div className="mb-2 text-sm font-medium text-gray-700">
-                      {(user?.subscription.credits || 0) - 500}/{500} Free
-                      Messages
+                      {user.subscription.creditsQuota -
+                        user.subscription.credits}
+                      /{user.subscription.creditsQuota} Free Messages
                     </div>
                     <Progress
                       value={
-                        (((user?.subscription.credits || 0) - 500) / 500) * 100
+                        ((user.subscription.creditsQuota -
+                          user.subscription.credits) /
+                          user.subscription.creditsQuota) *
+                        100
                       }
                       className="w-full"
                     />
                     <div className="mb-2 text-sm font-medium text-gray-700">
-                      {(user?.subscription.premiumCredits || 0) - 50}/{50}{" "}
-                      Premium Messages
+                      {user.subscription.premiumCreditsQuota -
+                        user.subscription.premiumCredits}
+                      /{user.subscription.premiumCreditsQuota} Premium Messages
                     </div>
                     <Progress
                       value={
-                        (((user?.subscription.premiumCredits || 0) - 50) / 50) *
+                        ((user.subscription.premiumCreditsQuota -
+                          user.subscription.premiumCredits) /
+                          user.subscription.premiumCreditsQuota) *
                         100
                       }
                       className="w-full"

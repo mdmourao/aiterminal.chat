@@ -15,5 +15,7 @@ export class SubscriptionResponseDTO {
     this.credits = subscription.credits;
     this.currentPeriodStart = subscription.current_period_start;
     this.currentPeriodEnd = subscription.current_period_end;
+    this.premiumCreditsQuota = subscription.premium_credits_quota;
+    this.creditsQuota = subscription.credits_quota;
   }
 }

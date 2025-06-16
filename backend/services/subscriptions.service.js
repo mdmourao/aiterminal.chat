@@ -156,6 +156,23 @@ class SubscriptionsService {
         });
       }
 
+      subscription = {
+        ...subscription,
+        // lowercase quota fields for consistency
+        premium_credits_quota: parseInt(
+          subscription.plan === "premium"
+            ? config.plans.premium.premiumCredits
+            : config.plans.free.premiumCredits,
+          10
+        ),
+        credits_quota: parseInt(
+          subscription.plan === "premium"
+            ? config.plans.premium.credits
+            : config.plans.free.credits,
+          10
+        ),
+      };
+
       return subscription;
     } catch (error) {
       logger.error(

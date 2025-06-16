@@ -183,8 +183,8 @@ export default function Chat({ chat_id }: { chat_id?: string }) {
         }
       }
     } catch (error) {
-      console.error("Message sending failed:", error);
       toast.error("Failed to send message. Please try again.");
+      console.error("Error sending message:", error);
       setIsLoading(false);
     }
   };
