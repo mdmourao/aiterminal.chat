@@ -19,10 +19,7 @@ class SubscriptionsController {
   async createPortalSession(req, res, next) {
     customLogger.info("createPortalSession");
     try {
-      const { session_id } = req.body;
-      const portalSession = await subscriptionsService.createCheckoutSession(
-        session_id
-      );
+      const portalSession = await subscriptionsService.createPortalSession(req);
       res.redirect(303, portalSession.url);
     } catch (error) {
       next(error);

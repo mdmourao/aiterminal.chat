@@ -65,31 +65,22 @@ class SubscriptionsService {
     }
   }
 
-  async createPortalSession(session_id) {
+  async createPortalSession(req) {
     try {
-      if (!session_id) {
-        throw new Error("Missing 'session_id' for createPortalSession.");
-      }
-
-      const checkoutSession = await stripe.checkout.sessions.retrieve(
-        session_id
+      const subscription = await subscriptionsRepository.getUserSubscription(
+        req.user.id
       );
-
-      if (!checkoutSession.customer) {
-        throw new Error(
-          `No customer found for checkout session ID: ${session_id}`
-        );
+      if (!subscription) {
+        throw new Error("Subcription not found");
       }
 
       const returnUrl = config.app.frontendBaseUrl;
 
       const portalSession = await stripe.billingPortal.sessions.create({
-        customer: checkoutSession.customer,
+        customer: subscription.stripe_customer_id,
         return_url: returnUrl,
       });
-      logger.info(
-        `Stripe Billing Portal Session created for customer: ${checkoutSession.customer}`
-      );
+
       return portalSession;
     } catch (error) {
       logger.error(`Error creating portal session: ${error.message}`, error);
