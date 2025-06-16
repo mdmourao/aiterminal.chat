@@ -1,4 +1,4 @@
-import { Terminal } from "lucide-react";
+import { Terminal, Sparkles } from "lucide-react";
 
 import {
   Sidebar,
@@ -28,7 +28,8 @@ import { Chat } from "@/app/models/chat";
 import { toast } from "sonner";
 import Link from "next/link";
 import { clearWarning } from "@/store/warningSlice";
-import StripeComponent from "@/app/stripe/stripe";
+import { Badge } from "./badge";
+import { Progress } from "./progress";
 
 export function AppSidebar() {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -91,9 +92,6 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarContent>
-          <StripeComponent></StripeComponent>
-        </SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -107,12 +105,75 @@ export function AppSidebar() {
                     alt="User Avatar"
                   />
                   {user?.name}
+
+                  <Badge>{user?.subscription.plan}</Badge>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>
+                  {user?.subscription.plan === "free" ? (
+                    <form
+                      action="/api/v1/subscriptions/create-checkout-session"
+                      method="POST"
+                      className="flex items-center gap-2"
+                    >
+                      <input
+                        type="hidden"
+                        name="lookup_key"
+                        value="aiterminal.chat_Pro_Plan-5e7b526"
+                      />
+                      <Sparkles />
+                      <button id="checkout-and-portal-button" type="submit">
+                        Upgrade to Pro ($7.99/mo)
+                      </button>
+                    </form>
+                  ) : (
+                    <form
+                      action="/api/v1/subscriptions/create-portal-session"
+                      method="POST"
+                      className="flex items-center gap-2"
+                    >
+                      <input type="hidden" name="cancel" value="true" />
+                      <Sparkles />
+                      <button id="cancel-subscription-button" type="submit">
+                        Cancel Subscription
+                      </button>
+                    </form>
+                  )}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem disabled>
+                  <div className="w-full max-w-sm">
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      {(user?.subscription.credits || 0) - 500}/{500} Free
+                      Messages
+                    </div>
+                    <Progress
+                      value={
+                        (((user?.subscription.credits || 0) - 500) / 500) * 100
+                      }
+                      className="w-full"
+                    />
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      {(user?.subscription.premiumCredits || 0) - 50}/{50}{" "}
+                      Premium Messages
+                    </div>
+                    <Progress
+                      value={
+                        (((user?.subscription.premiumCredits || 0) - 50) / 50) *
+                        100
+                      }
+                      className="w-full"
+                    />
+                  </div>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
                   onClick={async () => {
                     const authClient = createAuthClient();

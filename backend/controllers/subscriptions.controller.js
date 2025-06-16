@@ -1,15 +1,15 @@
-import paymentsService from "../services/payments.service.js";
+import subscriptionsService from "../services/subscriptions.service.js";
 import { BadRequestError } from "../utils/error.js";
 import customLogger from "../utils/logger.js";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-class PaymentsController {
+class SubscriptionsController {
   async createCheckoutSession(req, res, next) {
     customLogger.info("createCheckoutSession");
     try {
-      const session = await paymentsService.createCheckoutSession(req);
+      const session = await subscriptionsService.createCheckoutSession(req);
       res.redirect(303, session.url);
     } catch (error) {
       next(error);
@@ -20,7 +20,7 @@ class PaymentsController {
     customLogger.info("createPortalSession");
     try {
       const { session_id } = req.body;
-      const portalSession = await paymentsService.createCheckoutSession(
+      const portalSession = await subscriptionsService.createCheckoutSession(
         session_id
       );
       res.redirect(303, portalSession.url);
@@ -51,11 +51,11 @@ class PaymentsController {
       } else {
         event = JSON.parse(req.body);
       }
-      await paymentsService.webhook(event);
+      await subscriptionsService.webhook(event);
     } catch (error) {
       next(error);
     }
   }
 }
 
-export default new PaymentsController();
+export default new SubscriptionsController();
