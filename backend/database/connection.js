@@ -24,6 +24,5 @@ export const pingDb = async () => {
     logger.info("PostgreSQL connected successfully");
   } catch (error) {
     logger.error(error, "Database connection failed:");
-    process.exit(1);
   }
 };

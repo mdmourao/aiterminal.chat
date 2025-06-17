@@ -1,0 +1,7 @@
+services:
+  aiterminal_chat_backend:
+    build:
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: aiterminal_chat_backend
+    image: mdmourao7/martim-repo:aiterminal_chat_backend

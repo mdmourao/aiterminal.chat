@@ -48,6 +48,10 @@ export function Input(props: InputProps) {
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    props.handleSubmit(e);
+  };
+
   useEffect(() => {
     const lines = props.input.split("\n").length;
     setTextareaRows(Math.min(Math.max(lines, 4), 10));
@@ -58,6 +62,18 @@ export function Input(props: InputProps) {
       textareaRef.current.focus();
     }
   }, [showDropdownModels]);
+
+  // Focus textarea when loading finishes
+  useEffect(() => {
+    if (!props.isLoading && textareaRef.current) {
+      const timer = setTimeout(() => {
+        if (textareaRef.current && !textareaRef.current.disabled) {
+          textareaRef.current.focus();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [props.isLoading]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -75,12 +91,12 @@ export function Input(props: InputProps) {
         console.error("error getting models", error);
         toast.error("Failed to load models. Please try again later.");
       });
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div className=" border p-4 flex items-center justify-between border-green-600/30 ">
       <form
-        onSubmit={props.handleSubmit}
+        onSubmit={handleFormSubmit}
         className="w-full flex items-start gap-2"
       >
         <DropdownMenu

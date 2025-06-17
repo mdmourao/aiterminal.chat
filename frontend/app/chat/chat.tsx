@@ -23,7 +23,7 @@ export default function Chat({ chat_id }: { chat_id?: string }) {
     if (chat_id && chat_id !== chatId) {
       setChatId(chat_id);
     }
-  }, [chat_id]);
+  }, [chat_id, chatId]);
 
   useEffect(() => {
     if (chatId && chatId !== "" && isNewChat) {
@@ -42,22 +42,18 @@ export default function Chat({ chat_id }: { chat_id?: string }) {
           toast.error("Failed to load chat messages. Please try again later.");
         });
     }
-  }, [chatId]);
-
-  const newChat = () => {
-    setInput("");
-    setMessages([]);
-    setChatId("");
-    setSelectedModel("gpt-4.1-nano");
-    setIsNewChat(false);
-    router.push(`/`);
-  };
+  }, [chatId, isNewChat]);
 
   useEffect(() => {
     if (input === "clear") {
-      newChat();
+      setInput("");
+      setMessages([]);
+      setChatId("");
+      setSelectedModel("gpt-4.1-nano");
+      setIsNewChat(false);
+      router.push(`/`);
     }
-  }, [input]);
+  }, [input, router]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
