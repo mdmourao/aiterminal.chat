@@ -138,8 +138,10 @@ class MessageService {
       });
 
       for await (const delta of result.fullStream) {
+        logger.info("new data");
         if (delta.type === "text-delta") {
           fullResponseContent += delta.textDelta;
+          logger.info("stream data sendind");
           res.write(`event: textDelta\n`);
           res.write(
             `data: ${JSON.stringify({
@@ -154,6 +156,7 @@ class MessageService {
         throw new Error("No content received from AI model");
       }
 
+      logger.info("streamComplete");
       res.write(`event: streamComplete\n`);
       res.write(
         `data: ${JSON.stringify({
