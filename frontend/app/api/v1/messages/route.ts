@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   headers.set("Authorization", req.headers.get("authorization") || "");
   headers.set("cookie", req.headers.get("cookie") || "");
 
-  const response = await fetch(`${process.env.API_BASE_URL}api/v1/messages`, {
+  const response = await fetch(`${process.env.BASE_URL}api/v1/messages`, {
     method: "POST",
     headers,
     body: JSON.stringify(body),

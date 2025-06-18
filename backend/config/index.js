@@ -26,7 +26,6 @@ const config = {
   },
   app: {
     frontendBaseUrl: getRequiredStringEnv("FRONTEND_BASE_URL"),
-    apiBaseUrl: getRequiredStringEnv("BASE_URL"),
   },
   plans: {
     durationDays: getRequiredNumberEnv("SUBSCRIPTION_DURATION_DAYS"),

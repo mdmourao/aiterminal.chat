@@ -88,7 +88,7 @@ export default function HomePageContent() {
               className="bg-white text-gray-800 px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100"
               onClick={() => {
                 const authClient = createAuthClient({
-                  baseURL: "https://aiterminal.chat",
+                  baseURL: process.env.BASE_URL,
                 });
 
                 (async () => {

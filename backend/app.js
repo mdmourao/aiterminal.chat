@@ -23,7 +23,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://aiterminal.chat",
+    origin: process.env.FRONTEND_BASE_URL,
     credentials: true,
   })
 );

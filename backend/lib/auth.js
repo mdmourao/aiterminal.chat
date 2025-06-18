@@ -20,8 +20,8 @@ export const auth = betterAuth({
     ),
   }),
   debug: true,
-  baseURL: "https://aiterminal.chat",
-  trustedOrigins: ["https://aiterminal.chat"],
+  baseURL: process.env.FRONTEND_BASE_URL,
+  trustedOrigins: [process.env.FRONTEND_BASE_URL],
   socialProviders: {
     google: {
       prompt: "select_account",
