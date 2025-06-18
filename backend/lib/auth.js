@@ -20,8 +20,8 @@ export const auth = betterAuth({
     ),
   }),
   debug: true,
-  baseURL: "http://localhost:3000",
-  trustedOrigins: ["http://localhost:3001"],
+  baseURL: "https://aiterminal.chat",
+  trustedOrigins: ["https://aiterminal.chat"],
   socialProviders: {
     google: {
       prompt: "select_account",

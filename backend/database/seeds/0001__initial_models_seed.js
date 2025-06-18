@@ -12,7 +12,7 @@ export const seed = async function (knex) {
       value: "gemini-2.5-pro",
       label: "Gemini 2.5 pro",
       provider: "gemini",
-      premium: false,
+      premium: true,
     },
     {
       value: "o4-mini",

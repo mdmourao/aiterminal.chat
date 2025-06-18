@@ -225,7 +225,10 @@ export function AppSidebar() {
 
                 <DropdownMenuItem
                   onClick={async () => {
-                    const authClient = createAuthClient();
+                    const authClient = createAuthClient({
+                      baseURL: process.env.BASE_URL,
+                    });
+
                     await authClient.signOut();
                     dispatch({
                       type: "auth/logout",

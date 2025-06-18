@@ -87,12 +87,14 @@ export default function HomePageContent() {
             <button
               className="bg-white text-gray-800 px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-100"
               onClick={() => {
-                const authClient = createAuthClient();
+                const authClient = createAuthClient({
+                  baseURL: "https://aiterminal.chat",
+                });
 
                 (async () => {
                   await authClient.signIn.social({
                     provider: "google",
-                    callbackURL: window.location.origin,
+                    callbackURL: `${window.location.origin}`,
                   });
                 })();
               }}

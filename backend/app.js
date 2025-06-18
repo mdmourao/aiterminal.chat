@@ -4,24 +4,48 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import helmet from "helmet";
 import cors from "cors";
 import { toNodeHandler } from "better-auth/node";
 
 import apiRoutes from "./routes/api.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { pingDb } from "./database/connection.js";
-import { limiter } from "./middlewares/limiter.js";
 import logger from "./utils/logger.js";
 import { auth } from "./lib/auth.js";
 import { authMiddleware } from "./middlewares/auth.js";
 import subscriptionsController from "./controllers/subscriptions.controller.js";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 
 await pingDb();
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  cors({
+    origin: "https://aiterminal.chat",
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "a very secret key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      domain:
+        process.env.NODE_ENV === "production" ? ".aiterminal.chat" : undefined,
+    },
+  })
+);
+
 app.use(
   cors({
     origin: process.env.TRUSTED_ORIGINS?.split(",") || [],
@@ -48,7 +72,6 @@ app.post(
 );
 
 app.use(express.json());
-app.use(limiter);
 
 app.use("/api/v1", authMiddleware(), apiRoutes);
 
