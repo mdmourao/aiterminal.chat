@@ -9,7 +9,6 @@ export const authMiddleware = () => {
     });
 
     if (!session) {
-      customLogger.warn(JSON.stringify(req.headers));
       customLogger.warn("Unauthorized access attempt");
       return res.status(401).json({ error: "Unauthorized" });
     }

@@ -156,7 +156,7 @@ export function AppSidebar() {
                       <input
                         type="hidden"
                         name="lookup_key"
-                        value="aiterminal.chat_Pro_Plan-5e7b526"
+                        value="aiterminal.chat-pricing1"
                       />
                       <Sparkles />
                       <button id="checkout-and-portal-button" type="submit">

@@ -30,10 +30,8 @@ class SubscriptionsController {
     customLogger.info("webhook");
     try {
       let event = req.body;
-      const endpointSecret = "whsec_12345";
-      // Only verify the event if you have an endpoint secret defined.
-      // Otherwise use the basic event deserialized with JSON.parse
-      if (endpointSecret && process.env.NODE_ENV === "production") {
+      const endpointSecret = process.env.STRIPE_SIGNING_SECRET;
+      if (process.env.NODE_ENV === "production") {
         const signature = req.headers["stripe-signature"];
         try {
           event = stripe.webhooks.constructEvent(
