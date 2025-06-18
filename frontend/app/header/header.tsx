@@ -25,7 +25,7 @@ const Header = () => {
       </div>
       <div className="flex items-center gap-2 p-4 ">
         <Terminal className="w-5 h-5" />
-        <span className={`text-gray-800`}>aiterminal.chat</span>
+        <span className={`text-gray-800`}>aiterminal.chat (beta)</span>
       </div>
       <div className="flex items-center gap-2">
         <div className={`text-gray-600 text-sm`}>{currentTime}</div>

@@ -1,6 +1,6 @@
 class ControllersUtils {
   getLimitOffset(req) {
-    let limit = req.query.limit || 10;
+    let limit = req.query.limit || 50;
     const offset = req.query.offset || 0;
 
     if (limit > process.env.MAX_LIMIT_RESULTS) {
